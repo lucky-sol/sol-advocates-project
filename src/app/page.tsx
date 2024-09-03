@@ -29,7 +29,7 @@ export default function Home() {
   const totalNumAdvocates = useRef<number>(0);
   const [sorting, setSorting] = useState<SortingState>(Object.keys(DEFAULT_SORT).map(key => ({ id: key, desc: DEFAULT_SORT[key] === -1 })));
   const pageSorts = useRef(DEFAULT_SORT);
-
+  const [isLoading, setIsLoading] = useState(false);
 
   /**
    * Filters advocates based on the provided last name, page number, and limit.
@@ -39,6 +39,7 @@ export default function Home() {
    * @param newLimit - The maximum number of advocates to retrieve per page.
    */
   const filterAdvocates = useCallback(async (lastName: string = "", newPage: number = 1, newLimit: number = DEFAULT_LIMIT) => {
+    setIsLoading(true);
     searchTerm.current = lastName;
     page.current = newPage;
     limit.current = newLimit;
@@ -56,6 +57,8 @@ export default function Home() {
     setAdvocates(data);
     totalNumPages.current = _totalNumPages;
     totalNumAdvocates.current = _totalNumAdvocates;
+    setIsLoading(false);
+
   }, []);
 
   /**
@@ -144,7 +147,7 @@ export default function Home() {
         />
         <Button onClick={clearFilter} >clear</Button>
       </div>
-      <DataTable sorting={sorting} setSorting={setSorting} columns={columns} data={advocates} />
+      <DataTable sorting={sorting} setSorting={setSorting} columns={columns} data={advocates} isLoading={isLoading}/>
       <div className="flex items-center justify-end space-x-2 py-4">
         Page <Input onChange={handleOnChange} className="w-12 m-2 text-center" value={page.current}></Input> of {totalNumPages.current}
         <Button

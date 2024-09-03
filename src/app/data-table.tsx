@@ -1,8 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-
+import { LoaderIcon } from "lucide-react"
 import {
     ColumnDef,
     flexRender,
@@ -10,11 +9,9 @@ import {
     useReactTable,
     getPaginationRowModel,
     SortingState,
-    getSortedRowModel,
     ColumnFiltersState,
     getFilteredRowModel,
     VisibilityState,
-    ColumnSort,
     OnChangeFn
 } from "@tanstack/react-table"
 
@@ -40,14 +37,16 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[],
     setSorting: OnChangeFn<SortingState>
-    sorting: SortingState
+    sorting: SortingState,
+    isLoading: boolean
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
     sorting,
-    setSorting
+    setSorting,
+    isLoading
 }: DataTableProps<TData, TValue>) {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -124,6 +123,13 @@ export function DataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
+                        {isLoading && (
+                            <TableRow>
+                                <TableCell colSpan={columns?.length} className="h-24 text-center">
+                                    <LoaderIcon className="animate-spin h-8 w-8" />
+                                </TableCell>
+                            </TableRow>
+                        )}
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
@@ -141,6 +147,7 @@ export function DataTable<TData, TValue>({
                             <TableRow>
                                 <TableCell colSpan={columns?.length} className="h-24 text-center">
                                     No results.
+                                    
                                 </TableCell>
                             </TableRow>
                         )}
