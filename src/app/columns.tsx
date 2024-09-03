@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/card"
 import { formatPhoneNumber } from "@/lib/utils"
 import Link from "next/link"
+import { useToast } from "@/hooks/use-toast"
+
 
 const createHeader = (header: string) => {
     return function CustomHeader({ column }: { column: any }) {
@@ -79,7 +81,8 @@ export const columns: ColumnDef<IAdvocate>[] = [
     {
         id: "actions",
         cell: ({ row }) => {
-            const advocate = row.original
+            const advocate = row.original;
+            const { toast } = useToast();
 
             return (
                 <>
@@ -94,7 +97,14 @@ export const columns: ColumnDef<IAdvocate>[] = [
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem
-                                    onClick={() => navigator.clipboard.writeText(advocate.lastName)}
+                                    onClick={
+                                        () => {
+                                            navigator.clipboard.writeText(advocate.lastName);
+                                            toast({
+                                                description: "Copied ✅",
+                                                duration: 2000
+                                            })
+                                        }}
                                 >
                                     Copy Last Name
                                 </DropdownMenuItem>

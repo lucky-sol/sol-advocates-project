@@ -8,6 +8,8 @@ import { IAdvocate } from "@/db/schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SortingState } from "@tanstack/react-table";
+import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/hooks/use-toast"
 
 const DEFAULT_LIMIT = 5;
 
@@ -30,6 +32,7 @@ export default function Home() {
   const [sorting, setSorting] = useState<SortingState>(Object.keys(DEFAULT_SORT).map(key => ({ id: key, desc: DEFAULT_SORT[key] === -1 })));
   const pageSorts = useRef(DEFAULT_SORT);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast()
 
   /**
    * Filters advocates based on the provided last name, page number, and limit.
@@ -50,7 +53,11 @@ export default function Home() {
       .catch(error => {
         console.error("Error fetching advocates", error);
 
-        //TODO: Add error message to UI
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "Unable to fetch advocates. Please try again later.",
+        })
         return { data: [], totalNumPages: 0, totalNumAdvocates: 0 };
       })
 
@@ -131,7 +138,7 @@ export default function Home() {
     if (newPage > 0 && newPage <= totalNumPages.current) {
       goToPage(newPage);
     }
-  },[goToPage]);
+  }, [goToPage]);
 
   return (
     <main style={{ margin: "24px" }}>
@@ -147,7 +154,7 @@ export default function Home() {
         />
         <Button onClick={clearFilter} >clear</Button>
       </div>
-      <DataTable sorting={sorting} setSorting={setSorting} columns={columns} data={advocates} isLoading={isLoading}/>
+      <DataTable sorting={sorting} setSorting={setSorting} columns={columns} data={advocates} isLoading={isLoading} />
       <div className="flex items-center justify-end space-x-2 py-4">
         Page <Input onChange={handleOnChange} className="w-12 m-2 text-center" value={page.current}></Input> of {totalNumPages.current}
         <Button
@@ -167,6 +174,7 @@ export default function Home() {
           Next
         </Button>
       </div>
+      <Toaster />
     </main>
   );
 }
